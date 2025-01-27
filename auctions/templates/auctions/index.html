@@ -3,5 +3,29 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+    <div class="cards">
+        {% for listing in listings %}
+            <div class="listing-card">
+                <div class="listing-card-image">
+                    {% if listing.image_url == "" %}
+                        <span>
+                            No image available.
+                        </span>
+                    {% else %}
+                        <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }} item">
+                    {% endif %}
+                </div>
+                <div class="listing-card-content">
+                    <span class="listing-card-content-title">{{ listing.title.capitalize }}</span>
+                    <div class="listing-card-content-data">
+                        <span class="listing-card-content-data-price">Price: ${{ listing.starting_bid|floatformat:2 }}</span>
+                        <span>{{ listing.description }}</span>
+                        <span class="listing-card-content-data-date">Created {{ listing.datetime }}</span>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No listings available.</p>
+        {% endfor %}
+    <div class="cards">
 {% endblock %}

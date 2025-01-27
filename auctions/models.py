@@ -46,6 +46,7 @@ class Listing(Entity):
         
         return True
 
+
 class Bid(Entity):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bids")
     listing = models.ForeignKey(Listing, on_delete=models.PROTECT, related_name="bids")
