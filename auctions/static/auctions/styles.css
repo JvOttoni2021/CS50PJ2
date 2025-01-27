@@ -1,5 +1,5 @@
 body {
-    padding: 10px;
+    font-family: system-ui, sans-serif;
 }
 
 header {
@@ -7,11 +7,26 @@ header {
     align-items: center;
     justify-content: space-between;
     padding: 0 50px;
+    height: 100px;
+    background-color: #131921;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.nav-link {
+    color: white;
+}
+
+.nav-link:hover {
+    border: 1px solid white;
+    border-radius: 5px;
+    color: white;
 }
 
 .nav-div {
     display: flex;
     align-items: center;
+    column-gap: 10px;
 }
 
 .cards { 
