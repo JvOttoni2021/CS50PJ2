@@ -28,11 +28,23 @@ class Listing(Entity):
     starting_bid = models.FloatField(null=False)
     image_url = models.CharField(max_length=255, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='listings')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='listings', null=True)
     is_open = models.BooleanField(null=False, default=True)
 
     def __str__(self):
         return f"{self.title} - {self.starting_bid}"
-
+    
+    def is_valid(self):
+        if self.description == "":
+            return False
+        
+        if self.title == "":
+            return False
+        
+        if not float(self.starting_bid) > 0:
+            return False
+        
+        return True
 
 class Bid(Entity):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bids")
