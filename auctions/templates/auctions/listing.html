@@ -8,7 +8,14 @@
                 {% csrf_token %}
                 <div id="listing-content">
                     <h2>Listing: {{ listing.title }}</h2>
-                    <input type="submit" value="Watchlist" name="action" class="grey-button">
+                    {% if listing.is_open and user != listing.user %}
+                        <div class="div-row">
+                            <input type="submit" value="Watchlist" name="action" class="grey-button">
+                            <span class="validation-message">
+                                {{ watchlist_message }}
+                            </span>
+                        </div>
+                    {% endif %}
                     <div class="listing-card-image" id="listing-image">
                         <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }} item.">
                     </div>
@@ -23,18 +30,31 @@
                             <div class="details-content">{{ listing.category }}</div>
                         </div>
                         <div>
-                            <span id="listing-price">${{ listing.get_highest_value|floatformat:2 }}</span><br>
+                            <span id="listing-price">${{ listing.get_highest_bid|floatformat:2 }}</span><br>
                             <span id="listing-bid-text">
-                                {% if listing.bids|length > 0 %}
-                                    {{ listing.bids|length }} bid(s) so far.
+                                {% if listing.bids.all|length > 0 %}
+                                    {{ listing.bids.all|length }} bid(s) so far.
                                 {% else %}
                                     No bids yet.
                                 {% endif %}
                             </span>
-                            <div class="div-row">
-                                <input type="text" placeholder="Bid" name="new_bid_value">
-                                <input type="submit" value="Place Bid" name="action" class="blue-button">
-                            </div>
+                            {% if listing.is_open %}
+                                {% if user != listing.user %}
+                                    <div class="div-row">
+                                        <input type="text" placeholder="Bid" name="new_bid_value">
+                                        <input type="submit" value="Place Bid" name="action" class="blue-button">
+                                    </div>
+                                    <div class="validation-message">{{ bid_message }}</div>
+                                {% else %}
+                                    <br>
+                                    <input type="submit" value="Close" name="action" class="blue-button">
+                                {% endif %}
+                            {% else %}
+                                {% if user == listing.get_highest_bid.user %}
+                                    <div>You won this auction!</div>
+                                {% endif %}
+                                <div class="validation-message">Bid closed</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -51,10 +71,11 @@
                             No comments yet
                         </span>
                     {% endfor %}
-                    <div class="div-row">
+                    <div class="div-row" id="comment-input-div">
                         <input type="text" placeholder="Comment..." name="new_comment"><br>
                         <input type="submit" value="Add Comment" name="action" class="blue-button">
                     </div>
+                    <div class="validation-message">{{ comment_message }}</div>
                 </div>
             <form>
         {% endif %}

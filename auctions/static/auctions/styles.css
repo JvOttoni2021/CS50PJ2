@@ -6,7 +6,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 15%;
+    padding: 0 10%;
     height: 100px;
     background-color: #131921;
     color: white;
@@ -21,7 +21,8 @@ input[type=text]{
     padding: 5px 7px;
     border: 1px solid #dee1e6;
     border-radius: 3px;
-    width: 50%;
+    width: 80%;
+    margin-right: 10px;
 }
 
 .grey-button {
@@ -167,7 +168,6 @@ input[type=text]{
 .div-row {
     display: flex;
     flex-direction: row;
-    margin-bottom: 50px;
 }
 
 #details {
@@ -190,4 +190,14 @@ input[type=text]{
 
 .listing-data > div {
     padding: 0 20px
+}
+
+.validation-message {
+    font-size: 0.8em;
+    color: #818588;
+    margin: 2px;
+}
+
+#comment-input-div {
+    padding: 0 20px;
 }

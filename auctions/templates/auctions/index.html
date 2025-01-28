@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2>{{ title }}</h2>
 
     <div class="cards">
         {% for listing in listings %}
@@ -19,7 +19,7 @@
                     <div class="listing-card-content">
                         <span class="listing-card-content-title">{{ listing.id }} - {{ listing.title.capitalize }}</span>
                         <div class="listing-card-content-data">
-                            <span class="listing-card-content-data-price">Price: ${{ listing.starting_bid|floatformat:2 }}</span>
+                            <span class="listing-card-content-data-price">Price: ${{ listing.get_highest_bid|floatformat:2 }}</span>
                             <span>{{ listing.description }}</span>
                             <span class="listing-card-content-data-date">Created {{ listing.datetime }}</span>
                         </div>

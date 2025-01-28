@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import datetime
 
+SUCCESS_MESSAGE = "Success"
+
 class User(AbstractUser):
     def add_to_watchlist(self, listing):
         if listing.user == self:
@@ -13,7 +15,7 @@ class User(AbstractUser):
         
         watchlist = WatchList(user=self, listing=listing)
         watchlist.save()
-        return "Listing added to watchlist"
+        return SUCCESS_MESSAGE
 
 
 class Entity(models.Model):
@@ -45,11 +47,38 @@ class Listing(Entity):
         return f"{self.title} - {self.starting_bid}"
     
     def add_comment(self, comment, user):
+        if comment == "":
+            return "Comment must not be empty"
+        
         new_comment = Comment(user=user, comment_content=comment, listing=self)
         new_comment.save()
+        return SUCCESS_MESSAGE
+
+    def add_bid(self, bid_value, user):
+        if not self.is_open:
+            return "Listing is closed."
+        
+        if user == self.user:
+            return "Cannot bid your own listing."
+
+        try:
+            bid_value = float(bid_value)
+        
+            if bid_value <= self.get_highest_bid().bid_value:
+                return "Bid value must be greater than the actual value."
+
+            new_bid = Bid(user=user, bid_value=bid_value, listing=self)
+            new_bid.save()
+            return SUCCESS_MESSAGE
+        except:
+            return "Invalid input value."
     
-    def get_highest_value(self):
-        bid_list = self.bids
+    def close(self):
+        self.is_open = False
+        self.save()
+
+    def get_highest_bid(self):
+        bid_list = self.bids.all()
         if not bid_list.exists():
             return self.starting_bid
         
@@ -72,6 +101,9 @@ class Bid(Entity):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bids")
     listing = models.ForeignKey(Listing, on_delete=models.PROTECT, related_name="bids")
     bid_value = models.FloatField(null=False)
+
+    def __str__(self):
+        return str(self.bid_value)
 
 
 class WatchList(Entity):

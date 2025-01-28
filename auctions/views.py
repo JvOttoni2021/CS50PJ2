@@ -7,13 +7,23 @@ from django.urls import reverse
 
 from .models import User, Listing, Category, Bid, Comment
 from .forms_constructors import NewListingForm
-from . import util
 import traceback
 
 
-def index(request):
+def index(request, title=""):
+    user = request.user
     listings = Listing.objects.filter(is_open=True)
+    if title == "Watchlist" and user.is_authenticated:
+        watchlists = user.watchlist.all()
+        listings = [item.listing for item in watchlists]
+        title = title.capitalize()
+    if title == "My Listings" and user.is_authenticated:
+        listings = user.listings.all()
+    else:
+        title="Active Listings"
+
     return render(request, "auctions/index.html", {
+        "title": title,
         "listings": listings
     })
 
@@ -40,31 +50,33 @@ def login_view(request):
 @login_required(login_url="login")
 def show_listing(request, listing_id):
     user = request.user
-    message = ""
+    watchlist_message, comment_message, bid_message = "", "", ""
     try:
         listing_id = int(listing_id)
         listing = Listing.objects.filter(id=listing_id).first()
-        print(listing.comments.all())
-        print(Comment.objects.all()[0].listing)
+
         if request.method == "POST":
             action = request.POST.get("action")
 
             if action == "Watchlist":
-                print("watchlist")
-                message = user.add_to_watchlist(listing)
-                print(message)
+                watchlist_message = user.add_to_watchlist(listing)
 
-            if action == "Add Comment":
+            elif action == "Add Comment":
                 comment = request.POST.get("new_comment")
-                message = listing.add_comment(comment, user)
-                print(message)
+                comment_message = listing.add_comment(comment, user)
 
-            if action == "Place Bid":
-                pass
+            elif action == "Place Bid":
+                bid_value = request.POST.get("new_bid_value")
+                bid_message = listing.add_bid(bid_value, user)
+
+            elif action == "Close":
+                listing.close()
         
         return render(request, "auctions/listing.html", {
             "listing": listing,
-            "return_message": message
+            "watchlist_message": watchlist_message,
+            "comment_message": comment_message,
+            "bid_message": bid_message
         })
     except:
         print(traceback.format_exc())
