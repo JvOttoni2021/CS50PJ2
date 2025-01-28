@@ -1,0 +1,61 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+        {% if listing is None%}
+            <p>Listing not found.</p>
+        {% else %}
+            <form method="post" action="{% url 'show_listing' listing.id %}">
+                {% csrf_token %}
+                <div id="listing-content">
+                    <h2>Listing: {{ listing.title }}</h2>
+                    <input type="submit" value="Watchlist" name="action" class="grey-button">
+                    <div class="listing-card-image" id="listing-image">
+                        <img src="{{ listing.image_url }}" alt="Image for {{ listing.title }} item.">
+                    </div>
+                    <div class="listing-data">
+                        <div id="details">
+                            <h3>Details</h3>
+                            <div class="details-title">Description</div>
+                            <div class="details-content">{{ listing.description }}</div>
+                            <div class="details-title">Listed by</div>
+                            <div class="details-content">{{ listing.user }}</div>
+                            <div class="details-title">Category</div>
+                            <div class="details-content">{{ listing.category }}</div>
+                        </div>
+                        <div>
+                            <span id="listing-price">${{ listing.get_highest_value|floatformat:2 }}</span><br>
+                            <span id="listing-bid-text">
+                                {% if listing.bids|length > 0 %}
+                                    {{ listing.bids|length }} bid(s) so far.
+                                {% else %}
+                                    No bids yet.
+                                {% endif %}
+                            </span>
+                            <div class="div-row">
+                                <input type="text" placeholder="Bid" name="new_bid_value">
+                                <input type="submit" value="Place Bid" name="action" class="blue-button">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span>{{ return_message }}</span>
+                <div id="comment-section">
+                    <h3>Comments</h3>
+                    {% for comment in listing.comments.all %}
+                        <div class="div-comment">
+                            <span class="comment-user">{{ comment.user }}</span>
+                            <span class="comment-content">{{ comment.comment_content }}</span>
+                        </div>
+                    {% empty %}
+                        <span>
+                            No comments yet
+                        </span>
+                    {% endfor %}
+                    <div class="div-row">
+                        <input type="text" placeholder="Comment..." name="new_comment"><br>
+                        <input type="submit" value="Add Comment" name="action" class="blue-button">
+                    </div>
+                </div>
+            <form>
+        {% endif %}
+{% endblock %}

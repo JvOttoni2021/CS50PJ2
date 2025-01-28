@@ -1,11 +1,15 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Category
+from .models import User, Listing, Category, Bid, Comment
 from .forms_constructors import NewListingForm
+from . import util
+import traceback
+
 
 def index(request):
     listings = Listing.objects.filter(is_open=True)
@@ -32,6 +36,41 @@ def login_view(request):
             })
     else:
         return render(request, "auctions/login.html")
+
+@login_required(login_url="login")
+def show_listing(request, listing_id):
+    user = request.user
+    message = ""
+    try:
+        listing_id = int(listing_id)
+        listing = Listing.objects.filter(id=listing_id).first()
+        print(listing.comments.all())
+        print(Comment.objects.all()[0].listing)
+        if request.method == "POST":
+            action = request.POST.get("action")
+
+            if action == "Watchlist":
+                print("watchlist")
+                message = user.add_to_watchlist(listing)
+                print(message)
+
+            if action == "Add Comment":
+                comment = request.POST.get("new_comment")
+                message = listing.add_comment(comment, user)
+                print(message)
+
+            if action == "Place Bid":
+                pass
+        
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "return_message": message
+        })
+    except:
+        print(traceback.format_exc())
+        return render(request, "auctions/listing.html", {
+            "listing": None
+        })
 
 
 def logout_view(request):

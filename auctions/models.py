@@ -3,7 +3,17 @@ from django.db import models
 from datetime import datetime
 
 class User(AbstractUser):
-    pass
+    def add_to_watchlist(self, listing):
+        if listing.user == self:
+            return "Cannot add your own listing to watchlist"
+        
+        already_in_watchlist = WatchList.objects.filter(user=self, listing=listing, active=True).exists()
+        if already_in_watchlist:
+            return "The listing is already in your watchlist"
+        
+        watchlist = WatchList(user=self, listing=listing)
+        watchlist.save()
+        return "Listing added to watchlist"
 
 
 class Entity(models.Model):
@@ -33,6 +43,17 @@ class Listing(Entity):
 
     def __str__(self):
         return f"{self.title} - {self.starting_bid}"
+    
+    def add_comment(self, comment, user):
+        new_comment = Comment(user=user, comment_content=comment, listing=self)
+        new_comment.save()
+    
+    def get_highest_value(self):
+        bid_list = self.bids
+        if not bid_list.exists():
+            return self.starting_bid
+        
+        return sorted(bid_list, key=lambda bid: bid.bid_value, reverse=True)[0]
     
     def is_valid(self):
         if self.description == "":
