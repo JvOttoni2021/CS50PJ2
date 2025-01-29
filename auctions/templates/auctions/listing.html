@@ -34,6 +34,9 @@
                             <span id="listing-bid-text">
                                 {% if listing.bids.all|length > 0 %}
                                     {{ listing.bids.all|length }} bid(s) so far.
+                                    {% if user == listing.get_highest_bid.user and listing.is_open %}
+                                        Your bid is the current bid.
+                                    {% endif %}
                                 {% else %}
                                     No bids yet.
                                 {% endif %}

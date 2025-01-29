@@ -17,7 +17,7 @@ main {
     padding: 0 15%;
 }
 
-input[type=text]{
+input[type=text], input[type=password], input[type=email]{
     padding: 5px 7px;
     border: 1px solid #dee1e6;
     border-radius: 3px;
@@ -48,7 +48,9 @@ input[type=text]{
 }
 
 .blue-button:hover {
-    background-color: #0d6aff;
+    background-color: #0b56cf;
+    text-decoration: none;
+    color: white;
 }
 
 .nav-link {
@@ -86,7 +88,7 @@ input[type=text]{
 .listing-card-image > img {
     object-fit: cover;
     max-height: 100%;
-    width: auto;
+    max-width: 100%;
 }
 
 .listing-card-image {
@@ -200,4 +202,24 @@ input[type=text]{
 
 #comment-input-div {
     padding: 0 20px;
+    margin-top: 10px;
+}
+
+.form-grid > div {
+    display: grid;
+    grid-template-columns: 10% auto;
+    column-gap: 10px;
+    margin-bottom: 10px;
+}
+
+.form-grid > div > input {
+    width: 100%;
+}
+
+.form-grid > div > label {
+    text-align: right;
+}
+
+#ul-categories > li {
+    margin-bottom: 20px;
 }

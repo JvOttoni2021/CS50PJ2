@@ -17,14 +17,27 @@ def index(request, title=""):
         watchlists = user.watchlist.all()
         listings = [item.listing for item in watchlists]
         title = title.capitalize()
-    if title == "My Listings" and user.is_authenticated:
+    elif title == "My Listings" and user.is_authenticated:
         listings = user.listings.all()
-    else:
+    elif title == "":
         title="Active Listings"
+    else:
+        category = Category.objects.filter(name=title).first()
+        if category:
+            listings = category.listings.filter(is_open=True)
+            title = title.capitalize()
+        else:
+            return HttpResponseRedirect(reverse("index"))
 
     return render(request, "auctions/index.html", {
         "title": title,
         "listings": listings
+    })
+
+
+def view_categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": Category.objects.filter(active=True)
     })
 
 
@@ -117,8 +130,10 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+@login_required(login_url="login")
 def create_listing(request):
     user = request.user
+    message = ""
     if request.method == "POST":
         form = NewListingForm(request.POST)
         title = request.POST["title"]
@@ -136,11 +151,14 @@ def create_listing(request):
         
         if listing.is_valid():
             listing.save()
+            message = f"Listing {title} created!"
         else:
             return render(request, "auctions/create_listing.html", {
-                "form": form
+                "form": form,
+                "message": "Invalid data!"
             })
 
     return render(request, "auctions/create_listing.html", {
-        "form": NewListingForm()
+        "form": NewListingForm(),
+        "message":message
     })

@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="div-column">
+        <h2>Categories</h2>
+        <hr>
+        <ul id="ul-categories">
+        {% for category in categories %}
+            <li>
+                <a href="{% url 'index' category.name%}" class="blue-button">{{ category.name }}</a>
+            </li>
+        {% empty %}
+            <span>
+                No categories found.
+            </span>
+        {% endfor %}
+        <ul>
+    </div>
+{% endblock %}

@@ -9,9 +9,11 @@ class User(AbstractUser):
         if listing.user == self:
             return "Cannot add your own listing to watchlist"
         
-        already_in_watchlist = WatchList.objects.filter(user=self, listing=listing, active=True).exists()
-        if already_in_watchlist:
-            return "The listing is already in your watchlist"
+        watchlist_exist = WatchList.objects.filter(user=self, listing=listing, active=True).first()
+        print(watchlist_exist)
+        if watchlist_exist:
+            watchlist_exist.delete()
+            return "Listing removed from watchlist"
         
         watchlist = WatchList(user=self, listing=listing)
         watchlist.save()
@@ -62,11 +64,11 @@ class Listing(Entity):
             return "Cannot bid your own listing."
 
         try:
+            print(bid_value)
             bid_value = float(bid_value)
-        
-            if bid_value <= self.get_highest_bid().bid_value:
+            if bid_value <= float(self.get_highest_bid()):
                 return "Bid value must be greater than the actual value."
-
+            print(bid_value)
             new_bid = Bid(user=user, bid_value=bid_value, listing=self)
             new_bid.save()
             return SUCCESS_MESSAGE

@@ -3,7 +3,13 @@
 {% block body %}
     <form method="post" action="{% url 'create_listing' %}">
         {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Submit">
+        <div class="form-grid">
+            {{ form }}
+            <div>
+                <label><input type="submit" value="Create" class="blue-button"></label>
+                <div>{{ message }}</div>
+            </div>
+        </div>
+        <br>
     </form>
 {% endblock %}
